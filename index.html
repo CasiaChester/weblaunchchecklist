@@ -111,6 +111,21 @@
   <h1>Website Launch Checklist</h1>
   <button class="btn" onclick="clearCheckboxes()">Clear All Checkboxes</button>
 
+  <div id="newChecklistContainer" class="section" draggable="true" ondragstart="startDrag(event)" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <h2>Inner Pages</h2>
+    <!-- Dynamically added items will appear here -->
+    <label><input type="checkbox"> Home</label>
+    <label><input type="checkbox"> Facilities</label>
+    <label><input type="checkbox"> Staff</label>
+    <label><input type="checkbox"> History</label>
+    <label><input type="checkbox"> Testimonial</label>
+      <!-- Add Checklist button moved below -->
+  <div class="">
+    <button class="btn" onclick="createNewChecklist()">+ Add Checklist</button>
+  </div>
+  </div>
+
+  
   <div class="section" id="adminChecklist" draggable="true" ondragstart="startDrag(event)" ondragover="allowDrop(event)" ondrop="drop(event)">
     <h2>Admin Checklist</h2>
     <label><input type="checkbox"> OBITUARIES SETTINGS: number of obituaries is set - 20</label>
@@ -168,22 +183,6 @@
     <label><input type="checkbox"> Confirm correct brand in Admin Panel</label>
     <label><input type="checkbox"> FOR UPGRADES: SEO paused by coordinator</label>
   </div>
-
-  <div id="newChecklistContainer" class="section" draggable="true" ondragstart="startDrag(event)" ondragover="allowDrop(event)" ondrop="drop(event)">
-    <h2>Inner Pages</h2>
-    <!-- Dynamically added items will appear here -->
-    <label><input type="checkbox"> Home</label>
-    <label><input type="checkbox"> Facilities</label>
-    <label><input type="checkbox"> Staff</label>
-    <label><input type="checkbox"> History</label>
-    <label><input type="checkbox"> Testimonial</label>
-      <!-- Add Checklist button moved below -->
-  <div class="">
-    <button class="btn" onclick="createNewChecklist()">+ Add Checklist</button>
-  </div>
-  </div>
-
-
 
   <script>
     const SECTION_ORDER_KEY = "sectionOrder";
