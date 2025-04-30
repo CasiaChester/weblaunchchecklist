@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<!-- saved from url=(0072)file:///Users/chestercasia/Documents/Work%20Flow/WebLaunchChecklist.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <title>Website Launch Checklist</title>
+  <link rel="icon" type="image/png" href="file:///Users/chestercasia/Documents/Work%20Flow/Assets/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+  
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+  
+    .section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: grid;
+      grid-template-columns: 1fr; /* One column */
+      gap: 12px; /* Adds consistent spacing between items */
+    }
+  
+    .section h2 {
+      margin-top: 0;
+      color: #34495e;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      font-size: 1.2rem;
+    }
+  
+    label {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      cursor: pointer;
+    }
+  
+    input[type="checkbox"] {
+      margin-right: 12px;
+      transform: scale(1.2);
+      accent-color: #3498db;
+    }
+
+    .btn {
+      margin: 20px auto;
+      padding: 10px 20px;
+    }
+  
+    button {
+      display: block;
+      margin: 0;
+      padding: 0;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+  
+    button:hover {
+      background-color: #c0392b;
+    }
+  
+    .addedItem {
+      display: flex;
+      align-items: center;
+      margin: 0; /* Even space between added items */
+      padding: 0; /* Padding for added items */
+    }
+  
+    .addedItem label {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+    }
+  
+    .addedItem button {
+      margin-left: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  
+    @media (max-width: 600px) {
+      .section {
+        padding: 15px;
+      }
+  
+      label {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Website Launch Checklist</h1>
+  <button class="btn" onclick="clearCheckboxes()">Clear All Checkboxes</button>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  <script>
+    const SECTION_ORDER_KEY = "sectionOrder";
+    const CHECKBOX_STATE_KEY = "checkboxStates";
+    const ADDED_ITEMS_KEY = "addedChecklistItems";
+  
+    let draggedItem = null;
+  
+    function startDrag(event) {
+      draggedItem = event.target;
+      event.dataTransfer.setData("text", event.target.id);
+    }
+  
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+  
+    function drop(event) {
+      event.preventDefault();
+      if (draggedItem !== event.target && draggedItem !== null) {
+        if (event.target.classList.contains("section")) {
+          event.target.insertAdjacentElement('beforebegin', draggedItem);
+          saveSectionOrder();
+        }
+      }
+      draggedItem = null;
+    }
+  
+    function saveSectionOrder() {
+      const sections = document.querySelectorAll('.section');
+      const sectionIds = Array.from(sections).map(section => section.id);
+      localStorage.setItem(SECTION_ORDER_KEY, JSON.stringify(sectionIds));
+    }
+  
+    function loadSectionOrder() {
+      const storedOrder = localStorage.getItem(SECTION_ORDER_KEY);
+      if (storedOrder) {
+        const sectionIds = JSON.parse(storedOrder);
+        const container = document.body;
+        sectionIds.forEach(id => {
+          const section = document.getElementById(id);
+          if (section) {
+            container.appendChild(section);
+          }
+        });
+      }
+    }
+  
+    function getAllCheckboxes() {
+      return document.querySelectorAll('input[type="checkbox"]');
+    }
+  
+    function saveAllCheckboxStates() {
+      const checkboxes = getAllCheckboxes();
+      const states = {};
+      checkboxes.forEach((cb, i) => {
+        const label = cb.closest("label");
+        if (label) {
+          const text = label.textContent.replace("🗑️", "").trim();
+          states[text] = cb.checked;
+        }
+      });
+      localStorage.setItem(CHECKBOX_STATE_KEY, JSON.stringify(states));
+    }
+  
+    function restoreAllCheckboxStates() {
+      const stored = localStorage.getItem(CHECKBOX_STATE_KEY);
+      if (!stored) return;
+  
+      const states = JSON.parse(stored);
+      const checkboxes = getAllCheckboxes();
+      checkboxes.forEach(cb => {
+        const label = cb.closest("label");
+        if (label) {
+          const text = label.textContent.replace("🗑️", "").trim();
+          if (text in states) {
+            cb.checked = states[text];
+          }
+        }
+      });
+    }
+  
+    function createItemWrapper(itemText, isChecked = false) {
+      const label = document.createElement("label");
+      label.classList.add("addedItem");
+      label.style.display = "flex";
+      label.style.alignItems = "center";
+      label.style.justifyContent = "space-between";
+  
+      const leftSpan = document.createElement("span");
+      leftSpan.style.display = "flex";
+      leftSpan.style.alignItems = "center";
+  
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.style.marginRight = "12px";
+      checkbox.style.transform = "scale(1.2)";
+      checkbox.style.accentColor = "#3498db";
+      checkbox.checked = isChecked;
+  
+      const text = document.createTextNode(itemText);
+      leftSpan.appendChild(checkbox);
+      leftSpan.appendChild(text);
+  
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "🗑️";
+      deleteBtn.title = "Delete this item";
+      deleteBtn.style.background = "none";
+      deleteBtn.style.border = "none";
+      deleteBtn.style.cursor = "pointer";
+      deleteBtn.style.fontSize = "16px";
+      deleteBtn.onclick = () => {
+        label.remove();
+        saveChecklistItems();
+        saveAllCheckboxStates();
+      };
+  
+      checkbox.addEventListener("change", () => {
+        saveAllCheckboxStates();
+      });
+  
+      label.appendChild(leftSpan);
+      label.appendChild(deleteBtn);
+  
+      return label;
+    }
+  
+    function createNewChecklist() {
+      const itemText = prompt("Enter the checklist item text:");
+      if (!itemText) return;
+  
+      const container = document.getElementById("newChecklistContainer");
+      const buttonContainer = container.querySelector("button").parentElement;
+      const newItem = createItemWrapper(itemText, false);
+      container.insertBefore(newItem, buttonContainer);
+  
+      saveChecklistItems();
+      saveAllCheckboxStates();
+    }
+  
+    function saveChecklistItems() {
+      const items = document.querySelectorAll("#newChecklistContainer .addedItem span");
+      const itemTexts = Array.from(items).map(span => span.textContent.trim());
+      localStorage.setItem(ADDED_ITEMS_KEY, JSON.stringify(itemTexts));
+    }
+  
+    function loadChecklistItems() {
+      const storedItems = JSON.parse(localStorage.getItem(ADDED_ITEMS_KEY) || "[]");
+      const container = document.getElementById("newChecklistContainer");
+      const buttonContainer = container.querySelector("button").parentElement;
+  
+      storedItems.forEach(text => {
+        const checkboxStates = JSON.parse(localStorage.getItem(CHECKBOX_STATE_KEY) || "{}");
+        const isChecked = checkboxStates[text] || false;
+        const newItem = createItemWrapper(text, isChecked);
+        container.insertBefore(newItem, buttonContainer);
+      });
+    }
+  
+    function clearCheckboxes() {
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      saveAllCheckboxStates();
+    }
+  
+    document.addEventListener("DOMContentLoaded", () => {
+      loadSectionOrder();
+      loadChecklistItems();
+      restoreAllCheckboxStates();
+  
+      document.body.addEventListener("change", event => {
+        if (event.target.type === "checkbox") {
+          saveAllCheckboxStates();
+        }
+      });
+    });
+  </script>
+  
+  
+
+
+
+<div id="newChecklistContainer" class="section" draggable="true" ondragstart="startDrag(event)" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <h2>Inner Pages</h2>
+    <!-- Dynamically added items will appear here -->
+    <label><input type="checkbox"> Home</label>
+    <label><input type="checkbox"> Facilities</label>
+    <label><input type="checkbox"> Staff</label>
+    <label><input type="checkbox"> History</label>
+    <label><input type="checkbox"> Testimonial</label>
+      <!-- Add Checklist button moved below -->
+  <div class="">
+    <button class="btn" onclick="createNewChecklist()">+ Add Checklist</button>
+  </div>
+  </div><div class="section" id="adminChecklist" draggable="true" ondragstart="startDrag(event)" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <h2>Admin Checklist</h2>
+    <label><input type="checkbox"> OBITUARIES SETTINGS: number of obituaries is set - 20</label>
+    <label><input type="checkbox"> Tribute book Activated</label>
+    <label><input type="checkbox"> Legacy Touch activated</label>
+    <label><input type="checkbox"> Obituary Text Customization Activated</label>
+    <label><input type="checkbox"> LOCATION LIBRARY: all locations are added correctly...</label>
+    <label><input type="checkbox"> WEBSITE MANAGER SETTINGS: all fields are filled out...</label>
+    <label><input type="checkbox"> Outside store link removed (e.g. TELEFLORA)</label>
+    <label><input type="checkbox"> TRIBUTE STORE: theme is set</label>
+    <label><input type="checkbox"> USERS: admin/API credentials set; passwords checked</label>
+  </div><div class="section" id="homepageChecklist" draggable="true" ondragstart="startDrag(event)" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <h2>Homepage Checklist</h2>
+    <label><input type="checkbox"> LOGO FORMATTING: correct size and readability</label>
+    <label><input type="checkbox"> MENU COLORS: uniform across all screens</label>
+    <label><input type="checkbox"> BANNER TEXT: readable and linked properly</label>
+    <label><input type="checkbox"> BANNER PHOTOS: optimized and clear</label>
+    <label><input type="checkbox"> FAKE OBITS: added</label>
+    <label><input type="checkbox"> WELCOME text included</label>
+    <label><input type="checkbox"> FLOWER LINK: readable and matches theme</label>
+    <label><input type="checkbox"> OTHER PHOTOS: not overlapping; optimized</label>
+    <label><input type="checkbox"> BOX LINKS: correct titles, pages, and readability</label>
+    <label><input type="checkbox"> WHY CHOOSE US: buttons linked correctly</label>
+    <label><input type="checkbox"> LOCATION MAPS: real FH locations used</label>
+    <label><input type="checkbox"> ADA WIDGET present</label>
+    <label><input type="checkbox"> RESPONSIVE: all widths tested</label>
+    <label><input type="checkbox"> BROWSER CHECK: Chrome, Firefox, Safari</label>
+  </div><div class="section" id="sitePreparation" draggable="true" ondragstart="startDrag(event)" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <h2>Site Preparation</h2>
+    <label><input type="checkbox"> Hostnames correctly entered in Umbraco</label>
+    <label><input type="checkbox"> Screenshot MX records, name servers, homepages</label>
+    <label><input type="checkbox"> Archive client folders (Repo + email)</label>
+    <label><input type="checkbox"> Confirm correct brand in Admin Panel</label>
+    <label><input type="checkbox"> FOR UPGRADES: SEO paused by coordinator</label>
+  </div><div class="section" id="interiorChecklist" draggable="true" ondragstart="startDrag(event)" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <h2>Interior Checklist</h2>
+    <label><input type="checkbox"> DROPDOWN MENU: consistent color and activation</label>
+    <label><input type="checkbox"> OVERVIEW PAGES: box links match subpages</label>
+    <label><input type="checkbox"> SUBPAGES: checked on all screen sizes</label>
+    <label><input type="checkbox"> TOP BANNERS: correctly positioned</label>
+    <label><input type="checkbox"> INTERIOR TITLES: tested on small screens</label>
+    <label><input type="checkbox"> BULLETED LISTS: correctly indented</label>
+    <label><input type="checkbox"> TEXT TAGS: proper formatting (h1 - p)</label>
+    <label><input type="checkbox"> TOP PHOTOS: no duplicates except for banners</label>
+    <label><input type="checkbox"> CONTACT PAGE: Google Maps links match</label>
+    <label><input type="checkbox"> LOCAL BUSINESSES: page formatted correctly</label>
+    <label><input type="checkbox"> OTHER PHOTOS: optimized for loading</label>
+    <label><input type="checkbox"> ONLINE PLANNER: functional and complete</label>
+    <label><input type="checkbox"> UNUSED PAGES: deleted or sorted</label>
+    <label><input type="checkbox"> OBITS: set to rectangle</label>
+  </div></body></html>
